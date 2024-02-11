@@ -1,0 +1,51 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:context="http://www.springframework.org/schema/context"
+xmlns:mvc="http://www.springframework.org/schema/mvc" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:security="http://www.springframework.org/schema/security"
+xsi:schemaLocation="
+    http://www.springframework.org/schema/beans     
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/context 
+    http://www.springframework.org/schema/context/spring-context-3.0.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+			
+	<context:component-scan base-package="com.classes"/>
+	<!--  -->
+	<mvc:annotation-driven/>
+	<mvc:default-servlet-handler/>
+	<bean
+        class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+    <!-- Данные пользователей можно хранить в базе данных.это удобнее. например не нужно будет перезагружать приложение при изменении данных пользователя, просто меняем в БД и проверяем без перезагрузки и тому подобные удобства -->
+    
+     	<!-- Для этого в Spring Security есть специальные schemes. Нам нужно создавать таблицы в БД
+     	в соответствии с этими схемами. Схема Spring Security это правило по которому мы должны создавать таблицы и соединения между ними и какие названия полей должны быть в этих таблицах.
+		Например чтобы хранить юзеров как в прошлом проэкте в базе нужно создать таблицу с именем users и с атребутами 
+		username, password и enabled(0 - этот юзер может логиниться, 1 - не может). users соединенный связью 1коМногим с таблицей authorities в которой будут храниться роли пользователей
+		с аттребутами username, authority. И разработчик должен создать таблицы точно в соответствии с этой схемой. Благодаря этому Spring Security будет сам извлекать данные из
+		базы при запросах пользователя и разработчику не придеться писать в коде ни одного SQL запроса для извлечения.
+
+	create table users (username varchar(50) not null, password varchar(50) not null, enabled tinyint(1) not null, PRIMARY key(username)) ENGINE=InnoDB default CHARSET=latin1;
+	insert into users values ('Van','{noop}300',1), ('Billy','{noop}Aaah',1); 
+	Если кто думает что за {noop} перед паролем то это означает что в базе пароль будет храниться как обычный текст.
+	Если мы напрмер поставим {bcrypt} это значит что он храниться в закодированой форме с помощью алгоритма bcrypt.
+	Так очень желательно хранить пароли из соображений безопасности.Пользователь будет вбивать пароль обычным текстом,
+	фильтр будет его кодировать с помощью алгоритма bcrypt и сравнивать с тем закодированным паролем что в базе и если они совпадают значит пароль введен верно.
+	Пример добавления в базу: ('Van','{bcrypt}$2a$04$eFytJDGtjbThXa80FyOOBuFdK2IwjyWefYkMpiBEFlpBwDH.5PM0K',1),
+	create table authorities (username varchar(50) not null, authority varchar(50) not null, unique key authorities_idx_1 (username, authority), constraint authorities_ibfk_1 foreign key(username) references users (username)) ENGINE=InnoDB default CHARSET=latin1; 
+	insert into authorities values ('Van','LIVEinDUNGEON'), ('Van','ROLE_DUNGEONADMIN'), ('Billy','LIVEinDUNGEON'), ('Billy','SLAVE'); -->
+    
+	<!-- создаем бин класса DriverManagerDataSource. в который передаем необх. данные базы. -->
+    <bean id = "dataSource" 
+      class = "org.springframework.jdbc.datasource.DriverManagerDataSource">
+      	 <property name = "driverClassName" value = "com.mysql.jdbc.Driver"/>
+         <property name="url" value="jdbc:mysql://localhost/storage"/>
+       	 <property name="username" value="root"/>
+         <property name="password" value="07031998mike"/>
+   </bean>
+   
+</beans> 
